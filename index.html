@@ -1,74 +1,188 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Acceso Futurista</title>
+  <meta charset="UTF-8">
+  <title>Acceso - Casa de Fer</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+    }
 
-<style>
     body {
-        margin: 0;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: #000;
-        overflow: hidden;
-        font-family: Arial, sans-serif;
-        color: #fff;
-        text-align: center;
-    }
-
-    /* Fondo animado tipo “scanner vertical” */
-    body::before {
-        content: "";
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(180deg, transparent, rgba(0,255,255,0.07), transparent);
-        animation: scan 4s linear infinite;
-        pointer-events: none;
-    }
-
-    @keyframes scan {
-        0% { transform: translateY(-100%); }
-        100% { transform: translateY(100%); }
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #1c1c1c, #333);
+      font-family: Arial, sans-serif;
+      color: #fff;
+      text-align: center;
     }
 
     .container {
-        position: relative;
-        width: 95%;
-        max-width: 560px;
-        padding: 40px;
-        background: rgba(0, 40, 60, 0.25);
-        border-radius: 20px;
-        backdrop-filter: blur(12px);
-        box-shadow: 0 0 25px rgba(0,255,255,0.35);
-        border: 1px solid rgba(0, 255, 255, 0.25);
-        animation: glow 8s ease-in-out infinite;
-    }
-
-    @keyframes glow {
-        0%,100% { box-shadow: 0 0 25px rgba(0,255,255,0.3); }
-        50% { box-shadow: 0 0 45px rgba(0,255,255,0.55); }
+      width: 100%;
+      max-width: 500px;
+      padding: 40px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 25px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
     }
 
     h1 {
-        font-size: 38px;
-        margin-bottom: 25px;
-        font-weight: bold;
-        color: cyan;
-        text-shadow: 0 0 12px rgba(0,255,255,0.5);
-        animation: titleFloat 3.5s ease-in-out infinite;
-    }
-
-    @keyframes titleFloat {
-        0%,100% { transform: translateY(0); }
-        50% { transform: translateY(-6px); }
+      font-size: 32px;
+      margin-bottom: 25px;
+      color: #f0f0f0;
     }
 
     #pinDisplay {
-        font-size: 48px;
-        letter-spacing: 18px;
-        margin: 30px auto;
-        background: #
+      font-size: 40px;
+      letter-spacing: 14px;
+      margin: 25px 0;
+      background: #111;
+      padding: 20px;
+      border-radius: 15px;
+      width: 90%;
+      display: inline-block;
+      user-select: none;
+    }
+
+    .teclado {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      padding: 15px 25px;
+    }
+
+    .btn-num {
+      padding: 24px;
+      font-size: 32px;
+      border: none;
+      border-radius: 50%;
+      background: #444;
+      color: white;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .btn-num:active {
+      transform: scale(0.92);
+      background: #555;
+    }
+
+    #btn-ok {
+      padding: 18px;
+      border-radius: 15px;
+      background: #c0392b;
+      font-size: 26px;
+      grid-column: span 3;
+      margin-top: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    #btn-ok.correcto {
+      background: #27ae60 !important;
+    }
+
+    #bloqueado {
+      margin-top: 25px;
+      font-size: 20px;
+      color: #ff6666;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Bienvenida a la casa de Fer</h1>
+
+    <div id="pinDisplay">••••••</div>
+
+    <div class="teclado">
+      <button class="btn-num" onclick="agregar('1')">1</button>
+      <button class="btn-num" onclick="agregar('2')">2</button>
+      <button class="btn-num" onclick="agregar('3')">3</button>
+
+      <button class="btn-num" onclick="agregar('4')">4</button>
+      <button class="btn-num" onclick="agregar('5')">5</button>
+      <button class="btn-num" onclick="agregar('6')">6</button>
+
+      <button class="btn-num" onclick="agregar('7')">7</button>
+      <button class="btn-num" onclick="agregar('8')">8</button>
+      <button class="btn-num" onclick="agregar('9')">9</button>
+
+      <button class="btn-num" onclick="borrar()">⌫</button>
+      <button class="btn-num" onclick="agregar('0')">0</button>
+      <button class="btn-num" onclick="limpiar()">C</button>
+
+      <button id="btn-ok" onclick="validar()">ABRIR</button>
+    </div>
+
+    <div id="bloqueado">🔒 Sistema bloqueado por intentos fallidos</div>
+  </div>
+
+  <script>
+    let inputPIN = "";
+    let intentos = 0;
+    const PIN_CORRECTO = "123456";
+
+    function actualizarDisplay() {
+      let masked = inputPIN.padEnd(6, "•");
+      document.getElementById("pinDisplay").textContent = masked;
+    }
+
+    function agregar(num) {
+      if (intentos >= 3) return;
+      if (inputPIN.length < 6) {
+        inputPIN += num;
+        actualizarDisplay();
+      }
+    }
+
+    function borrar() {
+      if (inputPIN.length > 0) {
+        inputPIN = inputPIN.slice(0, -1);
+        actualizarDisplay();
+      }
+    }
+
+    function limpiar() {
+      inputPIN = "";
+      actualizarDisplay();
+    }
+
+    function validar() {
+      const btn = document.getElementById("btn-ok");
+      const lock = document.getElementById("bloqueado");
+
+      if (intentos >= 3) {
+        lock.style.display = "block";
+        if (navigator.vibrate) navigator.vibrate(300);
+        return;
+      }
+
+      if (inputPIN === PIN_CORRECTO) {
+        btn.classList.add("correcto");
+        setTimeout(() => {
+          window.location.href =
+            "https://www.virtualsmarthome.xyz/url_routine_trigger/activate.php?trigger=544ff1c4-0289-4c20-8bde-059d42080dd2&token=f7b36347-0d80-49bd-87c0-aa651806ce32&response=smartphone";
+        }, 600);
+      } else {
+        intentos += 1;
+        if (navigator.vibrate) navigator.vibrate([120, 80, 120]);
+        btn.style.background = "#8e1b1b";
+        setTimeout(() => btn.style.background = "#c0392b", 300);
+        if (intentos >= 3) {
+          lock.style.display = "block";
+        }
+      }
+      limpiar();
+    }
+  </script>
+</body>
+</html>
