@@ -1,196 +1,380 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Acceso</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cerradura de Fer</title>
 
-<style>
+  <style>
+    :root {
+      --color-fondo: #050608;
+      --color-card: #111319;
+      --color-acento: #00ff7f;
+      --color-acento-suave: rgba(0, 255, 127, 0.25);
+      --color-texto: #f5f5f5;
+      --color-error: #ff4b4b;
+      --color-bloqueo: #ff6b6b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background: radial-gradient(circle at top, #1a1f2b 0, #050608 55%);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--color-texto);
+    }
+
     body {
-        margin: 0;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: radial-gradient(circle, #111 0%, #000 100%);
-        font-family: Arial, sans-serif;
-        color: #fff;
-        text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
-    .container {
-        width: 95%;
-        max-width: 550px;
-        padding: 40px;
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 25px;
-        backdrop-filter: blur(12px);
-        box-shadow: 0 0 35px rgba(0,0,0,0.6);
+    .envoltorio {
+      width: 100%;
+      height: 100%;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
-    h1 {
-        font-size: 42px;
-        margin-bottom: 25px;
-        font-weight: bold;
-        text-shadow: 0 0 10px rgba(255,255,255,0.4);
+    .tarjeta {
+      width: 100%;
+      max-width: 480px;
+      background: linear-gradient(145deg, #11151f, #050608);
+      border-radius: 24px;
+      box-shadow:
+        0 0 40px rgba(0, 0, 0, 0.8),
+        0 0 18px var(--color-acento-suave);
+      padding: 28px 22px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
     }
 
-    #pinDisplay {
-        font-size: 45px;
-        letter-spacing: 18px;
-        margin: 30px 0;
-        background: #222;
-        padding: 25px;
-        border-radius: 15px;
-        width: 85%;
-        display: inline-block;
-        user-select: none;
+    .titulo {
+      text-align: center;
+      font-size: clamp(26px, 4vw, 32px);
+      font-weight: 600;
+      margin: 0;
+      text-shadow: 0 0 12px var(--color-acento-suave);
+    }
+
+    .subtitulo {
+      text-align: center;
+      margin: 0;
+      opacity: 0.8;
+      font-size: 16px;
+    }
+
+    .display {
+      margin: 12px auto 0;
+      width: 100%;
+      min-height: 58px;
+      border-radius: 16px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 8px 12px;
+      gap: 4px;
+    }
+
+    .dots {
+      font-size: 30px;
+      letter-spacing: 6px;
+      min-height: 34px;
+    }
+
+    .estado {
+      font-size: 14px;
+      opacity: 0.8;
+      text-align: center;
+      min-height: 18px;
+    }
+
+    .estado.error {
+      color: var(--color-error);
+      opacity: 1;
     }
 
     .teclado {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 22px;
-        padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 8px;
     }
 
-    .btn-num {
-        padding: 28px;
+    .tecla {
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: radial-gradient(circle at top, #1b2330 0, #070a10 60%);
+      padding: 14px 0;
+      font-size: 24px;
+      font-weight: 500;
+      text-align: center;
+      user-select: none;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out, border-color 0.08s ease-out;
+    }
+
+    .tecla:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+      border-color: var(--color-acento-suave);
+    }
+
+    .tecla-funcion {
+      font-size: 18px;
+    }
+
+    .tecla-accion {
+      grid-column: span 3;
+      background: linear-gradient(135deg, #00ff7f, #00b36b);
+      color: #050608;
+      font-weight: 700;
+      font-size: 22px;
+      letter-spacing: 1px;
+      border: none;
+      box-shadow:
+        0 0 20px rgba(0, 255, 127, 0.5),
+        0 6px 14px rgba(0, 0, 0, 0.9);
+    }
+
+    .tecla-accion:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow:
+        0 0 12px rgba(0, 255, 127, 0.55),
+        0 2px 10px rgba(0, 0, 0, 1);
+    }
+
+    .bloqueo {
+      margin-top: 4px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--color-bloqueo);
+      opacity: 0;
+      transition: opacity 0.15s ease-out;
+      min-height: 18px;
+    }
+
+    .bloqueo.visible {
+      opacity: 1;
+    }
+
+    .info-intentos {
+      font-size: 13px;
+      opacity: 0.7;
+      text-align: center;
+      margin-top: 4px;
+    }
+
+    @media (min-height: 800px) {
+      .tarjeta {
+        max-width: 520px;
+        padding: 32px 26px 26px;
+      }
+      .dots {
         font-size: 34px;
-        border: none;
-        border-radius: 50%;
-        background: #333;
-        color: white;
-        cursor: pointer;
-        transition: 0.15s;
+      }
+      .tecla {
+        padding: 18px 0;
+        font-size: 26px;
+      }
+      .tecla-funcion {
+        font-size: 20px;
+      }
+      .tecla-accion {
+        font-size: 24px;
+      }
     }
-
-    .btn-num:active {
-        transform: scale(0.9);
-        background: #444;
-    }
-
-    #btn-ok {
-        padding: 20px;
-        border-radius: 15px;
-        background: #c0392b;
-        font-size: 28px;
-        grid-column: span 3;
-        margin-top: 10px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: 0.25s;
-    }
-
-    #btn-ok.correcto {
-        background: #27ae60 !important;
-    }
-
-    #bloqueado {
-        margin-top: 25px;
-        font-size: 22px;
-        color: #ff4444;
-        display: none;
-    }
-</style>
+  </style>
 </head>
-
 <body>
+  <div class="envoltorio">
+    <div class="tarjeta">
+      <h1 class="titulo">Bienvenida a la casa de Fer</h1>
+      <p class="subtitulo">Ingresa el código para accionar la cerradura</p>
 
-<div class="container">
+      <div class="display">
+        <div id="dots" class="dots">••••••</div>
+        <div id="estado" class="estado"></div>
+      </div>
 
-    <h1>Bienvenida a la casa de Fer</h1>
+      <div class="teclado">
+        <div class="tecla" data-num="1">1</div>
+        <div class="tecla" data-num="2">2</div>
+        <div class="tecla" data-num="3">3</div>
 
-    <div id="pinDisplay">••••••</div>
+        <div class="tecla" data-num="4">4</div>
+        <div class="tecla" data-num="5">5</div>
+        <div class="tecla" data-num="6">6</div>
 
-    <div class="teclado">
-        <button class="btn-num" onclick="agregar('1')">1</button>
-        <button class="btn-num" onclick="agregar('2')">2</button>
-        <button class="btn-num" onclick="agregar('3')">3</button>
+        <div class="tecla" data-num="7">7</div>
+        <div class="tecla" data-num="8">8</div>
+        <div class="tecla" data-num="9">9</div>
 
-        <button class="btn-num" onclick="agregar('4')">4</button>
-        <button class="btn-num" onclick="agregar('5')">5</button>
-        <button class="btn-num" onclick="agregar('6')">6</button>
+        <div class="tecla tecla-funcion" data-accion="borrar">⌫</div>
+        <div class="tecla" data-num="0">0</div>
+        <div class="tecla tecla-funcion" data-accion="limpiar">C</div>
 
-        <button class="btn-num" onclick="agregar('7')">7</button>
-        <button class="btn-num" onclick="agregar('8')">8</button>
-        <button class="btn-num" onclick="agregar('9')">9</button>
+        <div class="tecla tecla-accion" data-accion="abrir">ABRIR</div>
+      </div>
 
-        <button class="btn-num" onclick="borrar()">⌫</button>
-        <button class="btn-num" onclick="agregar('0')">0</button>
-        <button class="btn-num" onclick="limpiar()">C</button>
-
-        <button id="btn-ok" onclick="validar()">ABRIR</button>
+      <div id="bloqueo" class="bloqueo">Sistema bloqueado por intentos fallidos</div>
+      <div id="intentosInfo" class="info-intentos"></div>
     </div>
+  </div>
 
-    <div id="bloqueado">🔒 Sistema bloqueado por intentos fallidos</div>
+  <script>
+    // 👇 CONFIGURACIÓN BÁSICA
+    const PIN_CORRECTO = "123456"; // CAMBIÁ ESTO POR TU PIN REAL
+    const MAX_INTENTOS = 5;
 
-</div>
+    // 👇 URL DEL TRIGGER (la que me pasaste de Virtual Smart Home)
+    const TRIGGER_URL =
+      "https://www.virtualsmarthome.xyz/url_routine_trigger/activate.php?trigger=544ff1c4-0289-4c20-8bde-059d42080dd2&token=f7b36347-0d80-49bd-87c0-aa651806ce32&response=smartphone";
 
-<script>
-let inputPIN = "";
-let intentos = 0;
-const PIN_CORRECTO = "123456";
+    let buffer = "";
+    let intentos = 0;
+    let bloqueado = false;
 
-function actualizarDisplay() {
-    let masked = inputPIN.padEnd(6, "•");
-    document.getElementById("pinDisplay").textContent = masked;
-}
+    const dotsEl = document.getElementById("dots");
+    const estadoEl = document.getElementById("estado");
+    const bloqueoEl = document.getElementById("bloqueo");
+    const intentosInfoEl = document.getElementById("intentosInfo");
 
-function agregar(num) {
-    if (intentos >= 3) return;
-
-    if (inputPIN.length < 6) {
-        inputPIN += num;
-        actualizarDisplay();
+    function actualizarDots() {
+      if (buffer.length === 0) {
+        dotsEl.textContent = "••••••";
+        dotsEl.style.opacity = 0.4;
+      } else {
+        dotsEl.style.opacity = 1;
+        dotsEl.textContent = "•".repeat(buffer.length);
+      }
     }
-}
 
-function borrar() {
-    if (inputPIN.length > 0) {
-        inputPIN = inputPIN.slice(0, -1);
-        actualizarDisplay();
+    function setEstado(mensaje, tipo = "normal") {
+      estadoEl.textContent = mensaje || "";
+      estadoEl.classList.toggle("error", tipo === "error");
     }
-}
 
-function limpiar() {
-    inputPIN = "";
-    actualizarDisplay();
-}
-
-function validar() {
-    const btn = document.getElementById("btn-ok");
-    const lock = document.getElementById("bloqueado");
-
-    if (intentos >= 3) {
-        lock.style.display = "block";
-        if (navigator.vibrate) navigator.vibrate(300);
+    function actualizarIntentosInfo() {
+      if (bloqueado) {
+        intentosInfoEl.textContent = "";
         return;
+      }
+      const restantes = MAX_INTENTOS - intentos;
+      intentosInfoEl.textContent =
+        restantes < MAX_INTENTOS
+          ? `Intentos restantes: ${restantes}`
+          : `Tienes ${MAX_INTENTOS} intentos antes del bloqueo`;
     }
 
-    if (inputPIN === PIN_CORRECTO) {
-        btn.classList.add("correcto");
+    function bloquearSistema() {
+      bloqueado = true;
+      bloqueoEl.classList.add("visible");
+      setEstado("Demasiados intentos incorrectos", "error");
+      buffer = "";
+      actualizarDots();
+      actualizarIntentosInfo();
+    }
 
-        setTimeout(() => {
-            window.location.href =
-                "https://www.virtualsmarthome.xyz/url_routine_trigger/activate.php?trigger=544ff1c4-0289-4c20-8bde-059d42080dd2&token=f7b36347-0d80-49bd-87c0-aa651806ce32&response=smartphone";
-        }, 600);
+    function manejarNumero(num) {
+      if (bloqueado) return;
+      if (buffer.length >= 10) return; // límite de longitud de código
+      buffer += num;
+      actualizarDots();
+      setEstado("");
+    }
 
-    } else {
-        intentos += 1;
+    function manejarAccion(accion) {
+      if (accion === "borrar") {
+        if (bloqueado) return;
+        buffer = buffer.slice(0, -1);
+        actualizarDots();
+        return;
+      }
 
-        if (navigator.vibrate) navigator.vibrate([120, 80, 120]);
+      if (accion === "limpiar") {
+        if (bloqueado) return;
+        buffer = "";
+        actualizarDots();
+        setEstado("");
+        return;
+      }
 
-        btn.style.background = "#8e1b1b";
-        setTimeout(() => btn.style.background = "#c0392b", 300);
-
-        if (intentos >= 3) {
-            lock.style.display = "block";
+      if (accion === "abrir") {
+        if (bloqueado) {
+          setEstado("Sistema bloqueado", "error");
+          return;
         }
+
+        if (!buffer.length) {
+          setEstado("Ingresa el código", "error");
+          return;
+        }
+
+        if (buffer === PIN_CORRECTO) {
+          setEstado("Accionando la cerradura...");
+          buffer = "";
+          actualizarDots();
+          intentos = 0;
+          actualizarIntentosInfo();
+
+          // 🔔 AQUÍ DISPARA EL TRIGGER REAL
+          fetch(TRIGGER_URL)
+            .then((resp) => {
+              // Podés inspeccionar resp si querés
+              setEstado("Cerradura accionada");
+            })
+            .catch((err) => {
+              console.error(err);
+              setEstado("Error al accionar la cerradura", "error");
+            });
+        } else {
+          intentos++;
+          setEstado("Código incorrecto", "error");
+          buffer = "";
+          actualizarDots();
+
+          if (intentos >= MAX_INTENTOS) {
+            bloquearSistema();
+          } else {
+            actualizarIntentosInfo();
+          }
+        }
+      }
     }
 
-    limpiar();
-}
-</script>
+    // Eventos del teclado visual
+    document.querySelectorAll(".tecla").forEach((tecla) => {
+      tecla.addEventListener("click", () => {
+        const num = tecla.getAttribute("data-num");
+        const accion = tecla.getAttribute("data-accion");
 
+        if (num !== null) {
+          manejarNumero(num);
+        } else if (accion) {
+          manejarAccion(accion);
+        }
+      });
+    });
+
+    // Inicialización
+    actualizarDots();
+    actualizarIntentosInfo();
+  </script>
 </body>
-</html>
+    </html>
